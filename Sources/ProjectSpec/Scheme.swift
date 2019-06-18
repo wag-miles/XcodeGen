@@ -70,24 +70,29 @@ public struct Scheme: Equatable {
         public var preActions: [ExecutionAction]
         public var postActions: [ExecutionAction]
         public var environmentVariables: [XCScheme.EnvironmentVariable]
+        public var disableMainThreadChecker: Bool
+
         public init(
             config: String,
             commandLineArguments: [String: Bool] = [:],
             preActions: [ExecutionAction] = [],
             postActions: [ExecutionAction] = [],
-            environmentVariables: [XCScheme.EnvironmentVariable] = []
+            environmentVariables: [XCScheme.EnvironmentVariable] = [],
+            disableMainThreadChecker: Bool = false
         ) {
             self.config = config
             self.commandLineArguments = commandLineArguments
             self.preActions = preActions
             self.postActions = postActions
             self.environmentVariables = environmentVariables
+            self.disableMainThreadChecker = disableMainThreadChecker
         }
     }
 
     public struct Test: BuildAction {
         public var config: String?
         public var gatherCoverageData: Bool
+        public var disableMainThreadChecker: Bool
         public var commandLineArguments: [String: Bool]
         public var targets: [TestTarget]
         public var preActions: [ExecutionAction]
@@ -119,6 +124,7 @@ public struct Scheme: Equatable {
         public init(
             config: String,
             gatherCoverageData: Bool = false,
+            disableMainThreadChecker: Bool = false,
             randomExecutionOrder: Bool = false,
             parallelizable: Bool = false,
             commandLineArguments: [String: Bool] = [:],
@@ -129,6 +135,7 @@ public struct Scheme: Equatable {
         ) {
             self.config = config
             self.gatherCoverageData = gatherCoverageData
+            self.disableMainThreadChecker = disableMainThreadChecker
             self.commandLineArguments = commandLineArguments
             self.targets = targets
             self.preActions = preActions
@@ -226,6 +233,7 @@ extension Scheme.Run: JSONObjectConvertible {
         preActions = jsonDictionary.json(atKeyPath: "preActions") ?? []
         postActions = jsonDictionary.json(atKeyPath: "postActions") ?? []
         environmentVariables = try XCScheme.EnvironmentVariable.parseAll(jsonDictionary: jsonDictionary)
+        disableMainThreadChecker = jsonDictionary.json(atKeyPath: "disableMainThreadChecker") ?? false
     }
 }
 
@@ -234,6 +242,7 @@ extension Scheme.Test: JSONObjectConvertible {
     public init(jsonDictionary: JSONDictionary) throws {
         config = jsonDictionary.json(atKeyPath: "config")
         gatherCoverageData = jsonDictionary.json(atKeyPath: "gatherCoverageData") ?? false
+        disableMainThreadChecker = jsonDictionary.json(atKeyPath: "disableMainThreadChecker") ?? false
         commandLineArguments = jsonDictionary.json(atKeyPath: "commandLineArguments") ?? [:]
         if let targets = jsonDictionary["targets"] as? [Any] {
             self.targets = try targets.compactMap { target in

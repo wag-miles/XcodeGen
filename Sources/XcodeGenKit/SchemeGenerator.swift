@@ -153,6 +153,7 @@ public class SchemeGenerator {
             postActions: scheme.test?.postActions.map(getExecutionAction) ?? [],
             shouldUseLaunchSchemeArgsEnv: scheme.test?.shouldUseLaunchSchemeArgsEnv ?? true,
             codeCoverageEnabled: scheme.test?.gatherCoverageData ?? false,
+            disableMainThreadChecker: scheme.test?.disableMainThreadChecker ?? false,
             commandlineArguments: testCommandLineArgs,
             environmentVariables: testVariables
         )
@@ -211,11 +212,13 @@ extension Scheme {
                 commandLineArguments: targetScheme.commandLineArguments,
                 preActions: targetScheme.preActions,
                 postActions: targetScheme.postActions,
-                environmentVariables: targetScheme.environmentVariables
+                environmentVariables: targetScheme.environmentVariables,
+                disableMainThreadChecker: targetScheme.disableMainThreadChecker
             ),
             test: .init(
                 config: debugConfig,
                 gatherCoverageData: targetScheme.gatherCoverageData,
+                disableMainThreadChecker: targetScheme.disableMainThreadChecker,
                 commandLineArguments: targetScheme.commandLineArguments,
                 targets: targetScheme.testTargets,
                 preActions: targetScheme.preActions,
